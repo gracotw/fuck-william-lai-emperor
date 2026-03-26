@@ -134,9 +134,9 @@
 	  var x1 = dartList[i].x;
 	  var y1 = dartList[i].y;
 	  if (dartList[i].time > 0) {
-	      var direction = 600;
-	      x1 = x1 + (dartList[i].time * 48 * Math.cos(direction / 180.0) / ctx.canvas.width);
-	      y1 = y1 + (dartList[i].time * 48 * Math.sin(direction / 180.0) / ctx.canvas.height);
+	      var direction = 191;
+	      x1 = x1 + (dartList[i].time * 48 * Math.cos(direction / 180.0 * Math.PI) / ctx.canvas.width);
+	      y1 = y1 + (dartList[i].time * 48 * Math.sin(direction / 180.0 * Math.PI) / ctx.canvas.height);
 	      dartList[i].time = dartList[i].time - 1;
 	      drawImageOnCornerXY(dartImage, [x1, y1], [0.1, 0.1/4.255]);
 	  } else {
