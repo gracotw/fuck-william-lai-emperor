@@ -1,1 +1,214 @@
-<html></html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="zh">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="author" content="GracoTW">
+    <meta name="copyright" content="Public Domain">
+    <title>清德宗丟水球射飛鏢</title>
+    <style>
+    	* { padding: 0; margin: 0; }
+    	canvas { background: #eee; display: block; margin: 0 auto; }
+    </style>
+  </head>
+  <body>
+<!--
+-->
+<canvas id="myCanvas" width="100%" height="100%"></canvas>
+
+<script>
+  // JavaScript code goes here
+  var canvas = document.getElementById("myCanvas");
+  var ctx = canvas.getContext("2d");
+  var stage = 0;
+  var stage0bgImage = new Image();
+  var dartImage = new Image();
+  var spillImage = new Image();
+  var waterBalloonImage = new Image();
+  var keyMap = [ 0, 0, 0, 0 ];
+  var score = 0;
+  var dartList = [];
+  var spillList = [];
+  var weapon = 0;
+
+  function loadImage(imgElement) {
+      return new Promise((resolve, reject) => {
+        // 如果圖片已經載入完成（例如從快取讀取）
+        if (imgElement.complete) {
+            resolve();
+        } else {
+            imgElement.onload = () => resolve();
+            imgElement.onerror = () => reject(new Error("圖片載入失敗"));
+        }
+      });
+  }
+  
+  stage0bgImage.src = "lai.webp";
+  dartImage.src = "dart.webp";
+  spillImage.src = "spill.webp";
+  waterBalloonImage.src = "waterballoon.webp";
+  
+  function doKeyDown(e) {
+      if (e.code == "KeyW" || e.code == "ArrowUp") {
+	  keyMap[0] = 1;
+      } else if (e.code == "KeyA" || e.code == "ArrowLeft") {
+	  keyMap[1] = 1;
+      } else if (e.code == "KeyS" || e.code == "ArrowDown") {
+	  keyMap[2] = 1;
+      } else if (e.code == "KeyD" || e.code == "ArrowRight") {
+	  keyMap[3] = 1;
+      }
+  }
+
+  function doKeyUp(e) {
+      if (e.code == "KeyW" || e.code == "ArrowUp") {
+	  keyMap[0] = 0;
+      } else if (e.code == "KeyA" || e.code == "ArrowLeft") {
+	  keyMap[1] = 0;
+      } else if (e.code == "KeyS" || e.code == "ArrowDown") {
+	  keyMap[2] = 0;
+      } else if (e.code == "KeyD" || e.code == "ArrowRight") {
+	  keyMap[3] = 0;
+      }
+  }
+  
+  function doMouseDown(e) {
+      var bbox = canvas.getBoundingClientRect();
+      var x = e.x - bbox.left *(canvas.width / bbox.width);
+      var y = e.y - bbox.top  * (canvas.height / bbox.height);
+
+      var xF = x/canvas.width;
+      var yF = y/canvas.height;
+
+      if (stage == 0) {
+	  if (xF > 0.9 && yF > 0.9) {
+	      weapon = 1 - weapon;
+	  } else if (weapon == 1) {
+	      var dart1 = {
+	          'x': xF,
+	          'y': yF,
+	          'time': 10
+	      };
+	      dartList.push(dart1);
+	  } else {
+	      var spill1 = {
+	          'x': xF,
+	          'y': yF,
+	          'time': 10
+	      };
+	      spillList.push(spill1);
+	  }
+      } 
+      //console.log("x = "+xF+" y = "+yF);
+  }
+
+  function doMouseMove(e) {
+      var bbox = canvas.getBoundingClientRect();
+      var x = e.x - bbox.left *(canvas.width / bbox.width);
+      var y = e.y - bbox.top  * (canvas.height / bbox.height);
+
+      var xF = x/canvas.width;
+      var yF = y/canvas.height;
+
+      if (stage == 0) {
+      }
+  }
+
+  function drawStage0() {
+      const cw = ctx.canvas.width;
+      const ch = ctx.canvas.height;
+      const iw = stage0bgImage.naturalWidth;
+      const ih = stage0bgImage.naturalHeight;
+      const scale = Math.min(cw/iw, ch/ih);
+      const nw = iw * scale;
+      const nh = ih * scale;
+      const dx = (cw - nw) / 2;
+      const dy = (ch - nh) / 2;
+      var i;
+
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, cw, ch);
+      ctx.drawImage(stage0bgImage, dx, dy, nw, nh);
+
+      for (i=0; i<dartList.length; i++) {
+	  var x1 = dartList[i].x;
+	  var y1 = dartList[i].y;
+	  if (dartList[i].time > 0) {
+	      var direction = 600;
+	      x1 = x1 + (dartList[i].time * 48 * Math.cos(direction / 180.0) / ctx.canvas.width);
+	      y1 = y1 + (dartList[i].time * 48 * Math.sin(direction / 180.0) / ctx.canvas.height);
+	      dartList[i].time = dartList[i].time - 1;
+	      drawImageOnCornerXY(dartImage, [x1, y1], [0.1, 0.1/4.255]);
+	  } else {
+	      drawImageOnCornerXY(dartImage, [x1, y1], [0.1, 0.1/4.255]);
+	  }
+      }
+      for (i=0; i<spillList.length; i++) {
+	  var x1 = spillList[i].x;
+	  var y1 = spillList[i].y;
+	  if (spillList[i].time > 0) {
+	      var direction = 600;
+	      x1 = x1 + (spillList[i].time * 48 * Math.cos(direction / 180.0) / ctx.canvas.width);
+	      y1 = y1 + (spillList[i].time * 48 * Math.sin(direction / 180.0) / ctx.canvas.height);
+	      spillList[i].time = spillList[i].time - 1;
+	      drawImageOnCenterXY(waterBalloonImage, [x1, y1], [0.1, 0.1]);
+	  } else {
+	      drawImageOnCenterXY(spillImage, [x1, y1], [0.1, 0.1]);
+	  }
+      }
+      if (weapon == 0) {
+	  drawImageOnCornerXY(dartImage, [1, 0.95], [0.1, 0.1/4.255]);
+      } else {
+	  drawImageOnCornerXY(waterBalloonImage, [1, 1], [0.1, 0.1]);
+      }	  
+  }
+
+  function drawImageOnCornerXY(img, pos, s) {
+      var imgW = ctx.canvas.width * s[0];
+      var imgH = ctx.canvas.height * s[1];
+      ctx.drawImage(img, pos[0]*ctx.canvas.width - imgW,
+		    pos[1]*ctx.canvas.height - imgH,
+		    imgW,
+		    imgH);
+  }
+  function drawImageOnCenterXY(img, pos, s) {
+      var imgW = ctx.canvas.width * s[0];
+      var imgH = ctx.canvas.height * s[1];
+      ctx.drawImage(img, pos[0]*ctx.canvas.width - imgW/2,
+		    pos[1]*ctx.canvas.height - imgH/2,
+		    imgW,
+		    imgH);
+  }
+  
+  function draw() {
+      var i;
+      ctx.canvas.width  = window.innerWidth;
+      ctx.canvas.height = window.innerHeight;
+
+      if (stage == 0) {
+	  drawStage0();
+      }
+  }
+
+  function mainLoop() {
+      var i;
+
+      if (stage == 0) {
+	  /* 遊戲起始畫面 */
+	  draw();
+      }
+  }
+
+  function init() {
+      canvas.addEventListener("mousedown", doMouseDown, false);
+      canvas.addEventListener("mousemove", doMouseMove, false);
+      window.addEventListener("keydown", doKeyDown, false);
+      window.addEventListener("keyup", doKeyUp, false);
+      setInterval(mainLoop, 40);
+  }
+
+  init();
+</script>
+
+  </body>
+</html>
