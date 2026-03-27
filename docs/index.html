@@ -130,19 +130,6 @@
       ctx.fillRect(0, 0, cw, ch);
       ctx.drawImage(stage0bgImage, dx, dy, nw, nh);
 
-      for (i=0; i<dartList.length; i++) {
-	  var x1 = dartList[i].x;
-	  var y1 = dartList[i].y;
-	  if (dartList[i].time > 0) {
-	      var direction = 191;
-	      x1 = x1 + (dartList[i].time * 48 * Math.cos(direction / 180.0 * Math.PI) / ctx.canvas.width);
-	      y1 = y1 + (dartList[i].time * 48 * Math.sin(direction / 180.0 * Math.PI) / ctx.canvas.height);
-	      dartList[i].time = dartList[i].time - 1;
-	      drawImageOnCornerXY(dartImage, [x1, y1], [0.1, 0.1/4.255]);
-	  } else {
-	      drawImageOnCornerXY(dartImage, [x1, y1], [0.1, 0.1/4.255]);
-	  }
-      }
       for (i=0; i<spillList.length; i++) {
 	  var x1 = spillList[i].x;
 	  var y1 = spillList[i].y;
@@ -156,7 +143,22 @@
 	      drawImageOnCenterXY(spillImage, [x1, y1], [0.1, 0.1]);
 	  }
       }
-      if (weapon == 0) {
+
+	  for (i=0; i<dartList.length; i++) {
+	  var x1 = dartList[i].x;
+	  var y1 = dartList[i].y;
+	  if (dartList[i].time > 0) {
+	      var direction = 191;
+	      x1 = x1 + (dartList[i].time * 48 * Math.cos(direction / 180.0 * Math.PI) / ctx.canvas.width);
+	      y1 = y1 + (dartList[i].time * 48 * Math.sin(direction / 180.0 * Math.PI) / ctx.canvas.height);
+	      dartList[i].time = dartList[i].time - 1;
+	      drawImageOnCornerXY(dartImage, [x1, y1], [0.1, 0.1/4.255]);
+	  } else {
+	      drawImageOnCornerXY(dartImage, [x1, y1], [0.1, 0.1/4.255]);
+	  }
+      }
+
+	  if (weapon == 0) {
 	  drawImageOnCornerXY(dartImage, [1, 0.95], [0.1, 0.1/4.255]);
       } else {
 	  drawImageOnCornerXY(waterBalloonImage, [1, 1], [0.1, 0.1]);
